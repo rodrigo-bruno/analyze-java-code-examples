@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export JAVA_HOME=/home/rbruno/software/openjdk1.8.0_252-jvmci-20.2-b01
-./gradlew build
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+gradle build
