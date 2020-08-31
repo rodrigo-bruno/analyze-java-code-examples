@@ -1,8 +1,12 @@
 group 'tomassetti.me'
 version '1.0-SNAPSHOT'
 
+apply plugin: "eclipse"
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin:'application'
+
+mainClassName = "me.tomassetti.examples.ModifyingCode"
 
 sourceCompatibility = 1.8
 
