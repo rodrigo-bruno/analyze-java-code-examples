@@ -2,9 +2,12 @@ package me.tomassetti.examples;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.expr.ArrayCreationExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.type.ArrayType;
+import com.github.javaparser.ast.type.TypeParameter;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -46,6 +49,21 @@ public class ModifyingCode {
     
     public static void specialize(SpecializationRequest sr) throws Exception {
     	CompilationUnit cu = StaticJavaParser.parse(new File(getClassPath(sr.getOrigSourcePath(), sr.getOrigPackage() + "." + sr.getOrigCompilationUnit())));
+
+    	// add all local classes for specialization 
+    	for (ClassOrInterfaceDeclaration kdecl : cu.findAll(ClassOrInterfaceDeclaration.class)) {
+    		boolean found = false;
+    		for (TypeParameter tp : kdecl.getTypeParameters()) {
+    			if (sr.getGenericTypesSubstitutions().containsKey(tp.getNameAsString())) {
+    				found = true;
+    				break;
+    			}
+    		}
+    		if (found) {
+    			sr.addTargetType(kdecl.getNameAsString());
+    		}
+    	}
+
     	specialize(sr, cu);
     }
     
@@ -57,10 +75,8 @@ public class ModifyingCode {
     	String origCompilationUnit = "ArrayList";
     	String genCompilationUnit = "ArrayListInteger";
         
-        SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.getGenericTypesSubstitutions().put("E", "Integer");
-        sr.getTargetTypes().put("ArrayList", "ArrayListInteger");
-        sr.getTargetTypes().put("SubList", "SubListInteger");
+    	SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
+    	sr.addGenericTypeSubstitutions("E", "Integer");
 
         specialize(sr);	
     }
@@ -72,19 +88,15 @@ public class ModifyingCode {
     	String genPackage = origPackage;
     	String origCompilationUnit = "HashMap";
     	String genCompilationUnit = "HashMapIntegerInteger";
-        
+
         SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.getGenericTypesSubstitutions().put("K", "Integer");
-        sr.getGenericTypesSubstitutions().put("V", "Integer");
-        sr.getTargetTypes().put("HashMap", "HashMapIntegerInteger");
-        sr.getTargetTypes().put("Node", "NodeIntegerInteger");
-        sr.getTargetTypes().put("HashMapSpliterator", "HashMapSpliteratorIntegerInteger");
-        sr.getTargetTypes().put("KeySpliterator", "KeySpliteratorIntegerInteger");
-        sr.getTargetTypes().put("ValueSpliterator", "ValueSpliteratorIntegerInteger");
-        sr.getTargetTypes().put("EntrySpliterator", "EntrySpliteratorIntegerInteger");
-        sr.getTargetTypes().put("TreeNode", "TreeNodeIntegerInteger");
-        sr.getTargetTypes().put("LinkedHashMap.Entry", "LinkedHashMapIntegerInteger.EntryIntegerInteger");
-        sr.getTargetTypes().put("LinkedHashMap", "LinkedHashMapIntegerInteger");
+        sr.addGenericTypeSubstitutions("K", "Integer");
+        sr.addGenericTypeSubstitutions("V", "Integer");
+
+        // classes outside the local compilation unit need to be manually imported for now
+        sr.addTargetType("LinkedHashMap");
+        sr.addTargetType("LinkedHashMap.Entry");
+
         specialize(sr);	
     }
     
@@ -95,18 +107,34 @@ public class ModifyingCode {
     	String genPackage = origPackage;
     	String origCompilationUnit = "LinkedHashMap";
     	String genCompilationUnit = "LinkedHashMapIntegerInteger";
+
+        SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
+        sr.addGenericTypeSubstitutions("K", "Integer");
+        sr.addGenericTypeSubstitutions("V", "Integer");
+
+        // classes outside the local compilation unit need to be manually imported for now
+        sr.addTargetType("LinkedHashMap.Entry");
+        sr.addTargetType("HashMap");
+        sr.addTargetType("HashMap.Node");
+        sr.addTargetType("Node");
+        sr.addTargetType("TreeNode");
+
+        specialize(sr);	
+    }
+    
+    public static void specializeConcurrentHashMap() throws Exception {
+    	String origSourcePath = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
+    	String genSourcePath = origSourcePath;
+    	String origPackage = "java.util.concurrent";
+    	String genPackage = origPackage;
+    	String origCompilationUnit = "ConcurrentHashMap";
+    	String genCompilationUnit = "ConcurrentHashMapIntegerInteger";
         
         SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.getGenericTypesSubstitutions().put("K", "Integer");
-        sr.getGenericTypesSubstitutions().put("V", "Integer");
-        sr.getTargetTypes().put("HashMap", "HashMapIntegerInteger");
-        sr.getTargetTypes().put("HashMap.Node", "HashMapIntegerInteger.NodeIntegerInteger");
-        sr.getTargetTypes().put("Node", "NodeIntegerInteger");
-        sr.getTargetTypes().put("LinkedHashMap", "LinkedHashMapIntegerInteger");
-        sr.getTargetTypes().put("Entry", "EntryIntegerInteger");
-        sr.getTargetTypes().put("LinkedHashMap.Entry", "LinkedHashMapIntegerInteger.EntryIntegerInteger");
-        sr.getTargetTypes().put("TreeNode", "TreeNodeIntegerInteger");
-        specialize(sr);	
+        sr.addGenericTypeSubstitutions("K", "Integer");
+        sr.addGenericTypeSubstitutions("V", "Integer");
+
+        specialize(sr);
     }
     
     public static void specializeASimpleCLass() throws Exception {
@@ -118,15 +146,16 @@ public class ModifyingCode {
     	String genCompilationUnit = "ASimpleClassInteger";
         
         SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.getGenericTypesSubstitutions().put("T", "Integer");
-        sr.getTargetTypes().put("ASimpleClass", "ASimpleClassInteger");
+        sr.addGenericTypeSubstitutions("T", "Integer");
+        sr.addTargetType("ASimpleClass");
         specialize(sr);	
     }
     
     public static void main(String[] args) throws Exception {
-    	specializeArrayList();
-    	specializeHashMap();
-    	specializeLinkedHashMap();
-    	specializeASimpleCLass();
+    	//specializeArrayList();
+    	//specializeHashMap();
+    	//specializeLinkedHashMap();
+    	specializeConcurrentHashMap();
+    	//specializeASimpleCLass();
     }
 }

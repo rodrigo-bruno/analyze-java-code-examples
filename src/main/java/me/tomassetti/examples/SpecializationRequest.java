@@ -22,6 +22,8 @@ public class SpecializationRequest {
 	
 	private Map<String, String> targetTypes;
 	
+	private String suffix;
+	
 	public SpecializationRequest(
 			String origSourcePath, 
 			String genSourcePath,
@@ -37,6 +39,7 @@ public class SpecializationRequest {
 		this.genCompilationUnit = genCompilationUnit;
 		this.genericTypesSubstitutions = new HashMap<>();
 		this.targetTypes = new HashMap<>();
+		this.suffix = "";
 	}
 
 	public String getOrigSourcePath() {
@@ -69,5 +72,23 @@ public class SpecializationRequest {
 
 	public Map<String, String> getTargetTypes() {
 		return targetTypes;
+	}
+	
+	public void addGenericTypeSubstitutions(String generic, String substitution) {
+		genericTypesSubstitutions.put(generic, substitution);
+		suffix = suffix + substitution;
+	}
+	
+	public void addTargetType(String type) {
+		String[] splits = type.split("\\.");
+		String result = "";
+		int i = 0;
+		
+		for (; i < splits.length - 1; i++) {
+			result = result + splits[i] + suffix + ".";
+		}
+		
+		result = result + splits[i] + suffix;
+		targetTypes.put(type, result);
 	}
 }

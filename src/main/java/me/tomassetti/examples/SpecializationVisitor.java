@@ -93,6 +93,7 @@ import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.IntersectionType;
 import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.ast.type.UnionType;
 import com.github.javaparser.ast.type.UnknownType;
@@ -208,10 +209,22 @@ public class SpecializationVisitor implements VoidVisitor<SpecializationRequest>
 		visitBelow(n, arg);
 	}
 
+	public void removeSpecializedTypeParameters(ClassOrInterfaceDeclaration n, SpecializationRequest arg) {
+		NodeList<TypeParameter> newlist = new NodeList<>();
+
+		for (TypeParameter ta : n.getTypeParameters()) {
+			if (!arg.getGenericTypesSubstitutions().containsKey(ta.toString())) {
+				newlist.add(ta);
+			}
+		}
+		
+		n.setTypeParameters(newlist);
+	}
+	
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, SpecializationRequest arg) {
 		if (arg.getTargetTypes().containsKey(n.getNameAsString())) {
-			n.setTypeParameters(new NodeList<>());
+			removeSpecializedTypeParameters(n, arg);
 			n.setName(arg.getTargetTypes().get(n.getNameAsString()));
 		}
 		visitBelow(n, arg);
@@ -242,11 +255,56 @@ public class SpecializationVisitor implements VoidVisitor<SpecializationRequest>
 			}
 		}
 	}
+
+	public void removeSpecializedTypeArguments(ClassOrInterfaceType n, SpecializationRequest arg) {
+		NodeList<Type> newlist = new NodeList<>();
+		int numGenericTypeSubsLeft = arg.getGenericTypesSubstitutions().size();
+		
+		if (n.getTypeArguments().isEmpty()) {
+			return;
+		}
+		
+		for (Type ta : n.getTypeArguments().get()) {
+			if (!arg.getGenericTypesSubstitutions().containsKey(ta.toString())) {
+				newlist.add(ta);
+			} else {
+				numGenericTypeSubsLeft--;
+				
+				// this happens if a class A extends a generic class B and uses multiple times
+				// type arguments that we are specializing. This happens in ConcurrentHashMap.
+				if (numGenericTypeSubsLeft < 0) {
+					newlist.add(new TypeParameter(arg.getGenericTypesSubstitutions().get(ta.toString())));
+				}
+				
+			}
+		}
+		
+		// if we are left with '<?, ?>' (or any other combination), this look tries to remove it.
+		for (Type ta : n.getTypeArguments().get()) {
+			
+			if (numGenericTypeSubsLeft <= 0) {
+				break;
+			}
+			
+			if (ta.toString().equals("?")) {
+				newlist.remove(ta);
+				numGenericTypeSubsLeft--;
+			}
+		}
+		
+		if (newlist.size() == 0) {
+			// if all the type arguments got removed, remove the '<>'
+			n.removeTypeArguments();
+		} else {
+			// install the new list of type arguments
+			n.setTypeArguments(newlist);	
+		}
+	}
 	
 	@Override
 	public void visit(ClassOrInterfaceType n, SpecializationRequest arg) {
 		if (arg.getTargetTypes().containsKey(getFullName(n))) {
-			n.removeTypeArguments();
+			removeSpecializedTypeArguments(n, arg);
 			setFullName(n, arg.getTargetTypes().get(getFullName(n)));
 		}
 		else if (arg.getGenericTypesSubstitutions().containsKey(n.getNameAsString())) {
