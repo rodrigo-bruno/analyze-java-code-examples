@@ -1,4 +1,4 @@
-package me.tomassetti.examples;
+package org.graalvm.datastructure.specialization;
 
 import java.util.HashMap;
 import java.util.Map;

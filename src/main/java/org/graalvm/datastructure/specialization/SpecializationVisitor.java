@@ -1,4 +1,4 @@
-package me.tomassetti.examples;
+package org.graalvm.datastructure.specialization;
 
 import java.util.Iterator;
 
@@ -101,6 +101,8 @@ import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
+
+import me.tomassetti.examples.SpecializationRequest;
 
 public class SpecializationVisitor implements VoidVisitor<SpecializationRequest> {
 

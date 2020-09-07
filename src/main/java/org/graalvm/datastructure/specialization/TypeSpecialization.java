@@ -1,4 +1,12 @@
-package me.tomassetti.examples;
+package org.graalvm.datastructure.specialization;
+
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -8,17 +16,20 @@ import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.TypeParameter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.List;
+import me.tomassetti.examples.SpecializationRequest;
+import me.tomassetti.examples.SpecializationVisitor;
+import me.tomassetti.examples.SpecializationVisitorConcurrentHashMap;
 
-public class ModifyingCode {
+public class TypeSpecialization {
 
-    private static String getClassPath(String sourcepath, String fullclassname) {
+	private static String getClassPath(String sourcepath, String fullclassname) {
     	return sourcepath + fullclassname.replace(".", "/") + ".java";
     }
 
+    private static void ensureDirectoryExists(String filePath) throws IOException {
+    	Files.createDirectories(Paths.get(filePath).getParent());
+    }
+    
     public static void checkUnnecessaryCasts(CompilationUnit cu) {
     	for (CastExpr cast : cu.findAll(CastExpr.class)) {
     		// check this patter: (NodeIntegerInteger[]) new NodeIntegerInteger[]
@@ -33,21 +44,26 @@ public class ModifyingCode {
     	}
     }
     
-    public static void specialize(SpecializationRequest sr, CompilationUnit cu) throws FileNotFoundException {
+    public static String specialize(SpecializationRequest sr, SpecializationVisitor sv, CompilationUnit cu) throws IOException {
+    	// file path where the specialized compilation unit will be
+    	String filePath = getClassPath(sr.getGenSourcePath(), sr.getOrigPackage() + "." + sr.getGenCompilationUnit());
 
         // specialize the full compulation unit
-        cu.accept(new SpecializationVisitor(), sr);
+        cu.accept(sv, sr);
    	
         // deletes unnecessary casts
     	checkUnnecessaryCasts(cu);
-        
+
         // creating java file
-    	try (PrintWriter out = new PrintWriter(getClassPath(sr.getOrigSourcePath(), sr.getOrigPackage() + "." + sr.getGenCompilationUnit()))) {
+    	ensureDirectoryExists(filePath);
+    	try (PrintWriter out = new PrintWriter(filePath)) {
     		out.print(cu);
     	}
+    	
+    	return filePath;
     }
     
-    public static void specialize(SpecializationRequest sr) throws Exception {
+    public static String specialize(SpecializationRequest sr, SpecializationVisitor sv) throws Exception {
     	CompilationUnit cu = StaticJavaParser.parse(new File(getClassPath(sr.getOrigSourcePath(), sr.getOrigPackage() + "." + sr.getOrigCompilationUnit())));
 
     	// add all local classes for specialization 
@@ -63,54 +79,54 @@ public class ModifyingCode {
     			sr.addTargetType(kdecl.getNameAsString());
     		}
     	}
-
-    	specialize(sr, cu);
+    	
+    	return specialize(sr, sv, cu);
     }
     
-    public static void specializeArrayList() throws Exception {
-    	String origSourcePath = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-    	String genSourcePath = origSourcePath;
+    public static String specialize(SpecializationRequest sr) throws Exception {
+    	return specialize(sr, new SpecializationVisitor());
+    }
+    
+    public static String specializeArrayList(String jdkSources, String patchedSources, String E) throws Exception {
     	String origPackage = "java.util";
     	String genPackage = origPackage;
     	String origCompilationUnit = "ArrayList";
-    	String genCompilationUnit = "ArrayListInteger";
+    	String genCompilationUnit = "ArrayList" + E;
         
-    	SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-    	sr.addGenericTypeSubstitutions("E", "Integer");
+    	SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
+    	sr.addGenericTypeSubstitutions("E", E);
 
-        specialize(sr);	
+        return specialize(sr);	
     }
-    
-    public static void specializeHashMap() throws Exception {
-    	String origSourcePath = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-    	String genSourcePath = origSourcePath;
+
+    // TODO - we should check if we already have such specialization on disk
+    public static String specializeHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
+    	String origSourcePath = jdkSources;
+    	String genSourcePath = "/home/rbruno/garbage/test-split-packages/src/java.base/";
     	String origPackage = "java.util";
     	String genPackage = origPackage;
     	String origCompilationUnit = "HashMap";
-    	String genCompilationUnit = "HashMapIntegerInteger";
+    	String genCompilationUnit = "HashMap" + K + V;
 
         SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", "Integer");
-        sr.addGenericTypeSubstitutions("V", "Integer");
+        sr.addGenericTypeSubstitutions("K", K);
+        sr.addGenericTypeSubstitutions("V", V);
 
         // classes outside the local compilation unit need to be manually imported for now
         sr.addTargetType("LinkedHashMap");
         sr.addTargetType("LinkedHashMap.Entry");
-
-        specialize(sr);	
+        return specialize(sr);	
     }
     
-    public static void specializeLinkedHashMap() throws Exception {
-    	String origSourcePath = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-    	String genSourcePath = origSourcePath;
+    public static String specializeLinkedHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
     	String origPackage = "java.util";
     	String genPackage = origPackage;
     	String origCompilationUnit = "LinkedHashMap";
-    	String genCompilationUnit = "LinkedHashMapIntegerInteger";
+    	String genCompilationUnit = "LinkedHashMap" + K + V;
 
-        SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", "Integer");
-        sr.addGenericTypeSubstitutions("V", "Integer");
+        SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
+        sr.addGenericTypeSubstitutions("K", K);
+        sr.addGenericTypeSubstitutions("V", V);
 
         // classes outside the local compilation unit need to be manually imported for now
         sr.addTargetType("LinkedHashMap.Entry");
@@ -118,23 +134,19 @@ public class ModifyingCode {
         sr.addTargetType("HashMap.Node");
         sr.addTargetType("Node");
         sr.addTargetType("TreeNode");
-
-        specialize(sr);	
+        return specialize(sr);	
     }
     
-    public static void specializeConcurrentHashMap() throws Exception {
-    	String origSourcePath = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-    	String genSourcePath = origSourcePath;
+    public static String specializeConcurrentHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
     	String origPackage = "java.util.concurrent";
     	String genPackage = origPackage;
     	String origCompilationUnit = "ConcurrentHashMap";
-    	String genCompilationUnit = "ConcurrentHashMapIntegerInteger";
+    	String genCompilationUnit = "ConcurrentHashMap" + K + V;
         
-        SpecializationRequest sr = new SpecializationRequest(origSourcePath, genSourcePath, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", "Integer");
-        sr.addGenericTypeSubstitutions("V", "Integer");
-
-        specialize(sr);
+        SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, genPackage, origCompilationUnit, genCompilationUnit);
+        sr.addGenericTypeSubstitutions("K", K);
+        sr.addGenericTypeSubstitutions("V", V);
+        return specialize(sr, new SpecializationVisitorConcurrentHashMap());
     }
     
     public static void specializeASimpleCLass() throws Exception {
@@ -152,10 +164,12 @@ public class ModifyingCode {
     }
     
     public static void main(String[] args) throws Exception {
-    	//specializeArrayList();
-    	//specializeHashMap();
-    	//specializeLinkedHashMap();
-    	specializeConcurrentHashMap();
+    	String jdkSources = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
+    	String patchedSources = "/tmp/org.graalvm.datastructure.specialization/src/";
+    	specializeArrayList(jdkSources, patchedSources, "Integer");
+    	specializeHashMap(jdkSources, patchedSources, "String", "String");
+    	specializeLinkedHashMap(jdkSources, patchedSources, "String", "String");
+    	specializeConcurrentHashMap(jdkSources, patchedSources, "Integer", "Integer");
     	//specializeASimpleCLass();
     }
 }
