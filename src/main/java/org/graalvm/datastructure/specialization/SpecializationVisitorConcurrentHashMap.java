@@ -4,9 +4,6 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 
-import me.tomassetti.examples.SpecializationRequest;
-import me.tomassetti.examples.SpecializationVisitor;
-
 public class SpecializationVisitorConcurrentHashMap extends SpecializationVisitor {
 	
 	@Override

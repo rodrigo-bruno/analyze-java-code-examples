@@ -6,32 +6,21 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.graalvm.datastructure.specialization.TypeSpecialization;
+import org.graalvm.datastructure.utils.CompilationRequest;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class SpecializedDataStructureFactory extends DataStructureFactory {
 
+	// TODO - make these configurable
 	private static String jdkSources = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-	private static String tmpDir = "/tmp/org.graalvm.datastructure.specialization";
-	private static String patchedSrcPath = tmpDir + "/src/";
-	private static String patchedModPath = tmpDir + "/patched/java.base/";
+	private static String workDir = "/tmp/org.graalvm.datastructure.specialization";
+	private static String patchedSrcPath = workDir + "/src/";
+	private static String patchedModPath = workDir + "/patched/java.base/";
 
-	private static void compile(String[] filePaths) throws Exception {
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec("javac --patch-module java.base=" + patchedSrcPath +  " -d " + patchedModPath  + " " + String.join(" ", filePaths));
-            p.waitFor();
-
-            if (p.exitValue() != 0) {
-            	throw new Exception("compilation of specialized data structures failed...");
-            }
-
-            p.destroy();
-        } catch (Exception e) {
-        	e.printStackTrace();
-        	throw e;
-        }
+	public static void compile(String[] filePaths) throws Exception {
+        CompilationRequest.compile(patchedSrcPath, patchedModPath, filePaths);
 	}
 
 	// TODO - what if the parameter cannot be statically discovered?

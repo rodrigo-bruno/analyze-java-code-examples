@@ -102,7 +102,6 @@ import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 
-import me.tomassetti.examples.SpecializationRequest;
 
 public class SpecializationVisitor implements VoidVisitor<SpecializationRequest> {
 
