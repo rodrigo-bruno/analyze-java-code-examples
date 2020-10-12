@@ -72,8 +72,8 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 	public <K,V> AbstractMap<K,V> HashMap(Class<K> parK, Class<V> parV) {
 		try {
 			String hmClassName = "java.util.HashMap" + parK.getSimpleName() + parV.getSimpleName();
-			String hmSpecializedPath = TypeSpecialization.specializeHashMap(jdkSources, patchedSrcPath, parK.getSimpleName(), parV.getSimpleName());
-			String lhmSpecializedPath = TypeSpecialization.specializeLinkedHashMap(jdkSources, patchedSrcPath, parK.getSimpleName(), parV.getSimpleName());
+			String hmSpecializedPath = TypeSpecialization.specializeHashMap(jdkSources, patchedSrcPath, parK.getName(), parV.getName());
+			String lhmSpecializedPath = TypeSpecialization.specializeLinkedHashMap(jdkSources, patchedSrcPath, parK.getName(), parV.getName());
 			compile(new String[] { hmSpecializedPath, lhmSpecializedPath });
 			return (AbstractMap<K,V>) Class.forName(hmClassName).getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
@@ -86,7 +86,7 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parK, Class<V> parV) {
 		try {
 			String className = "java.util.concurrent.ConcurrentHashMap" + parK.getSimpleName() + parV.getSimpleName();
-			String specializedPath = TypeSpecialization.specializeConcurrentHashMap(jdkSources, patchedSrcPath, parK.getSimpleName(), parV.getSimpleName());
+			String specializedPath = TypeSpecialization.specializeConcurrentHashMap(jdkSources, patchedSrcPath, parK.getName(), parV.getName());
 			compile(new String[] { specializedPath });
 			return (AbstractMap<K,V>) Class.forName(className).getDeclaredConstructor().newInstance();
 		} catch (Exception e) {

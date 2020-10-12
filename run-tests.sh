@@ -22,6 +22,5 @@ function run_test {
 }
 
 run_test ArrayListTest
-run_test ArrayListTest2
 run_test HashMapTest
 run_test ConcurrentHashMapTest

@@ -102,15 +102,18 @@ public class TypeSpecialization {
         return specialize(sr);	
     }
 
-    // TODO - add support for fullEName
-    public static String specializeHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
+    public static String specializeHashMap(String jdkSources, String patchedSources, String fullKName, String fullVName) throws Exception {
     	String origPackage = "java.util";
     	String origCompilationUnit = "HashMap";
-    	String genCompilationUnit = "HashMap" + K + V;
+    	String simpleKName = fullKName.substring(fullKName.lastIndexOf('.') + 1);
+    	String simpleVName = fullVName.substring(fullVName.lastIndexOf('.') + 1);
+    	String genCompilationUnit = "HashMap" + simpleKName + simpleVName;
 
         SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, origPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", K);
-        sr.addGenericTypeSubstitutions("V", V);
+        sr.addGenericTypeSubstitutions("K", simpleKName);
+        sr.addGenericTypeSubstitutions("V", simpleVName);
+        sr.addImport(fullKName);
+        sr.addImport(fullVName);
 
         // classes outside the local compilation unit need to be manually imported for now
         sr.addTargetType("LinkedHashMap");
@@ -118,15 +121,18 @@ public class TypeSpecialization {
         return specialize(sr);	
     }
 
-    // TODO - add support for fullEName
-    public static String specializeLinkedHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
+    public static String specializeLinkedHashMap(String jdkSources, String patchedSources, String fullKName, String fullVName) throws Exception {
     	String origPackage = "java.util";
     	String origCompilationUnit = "LinkedHashMap";
-    	String genCompilationUnit = "LinkedHashMap" + K + V;
+    	String simpleKName = fullKName.substring(fullKName.lastIndexOf('.') + 1);
+    	String simpleVName = fullVName.substring(fullVName.lastIndexOf('.') + 1);
+    	String genCompilationUnit = "LinkedHashMap" + simpleKName + simpleVName;
 
         SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, origPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", K);
-        sr.addGenericTypeSubstitutions("V", V);
+        sr.addGenericTypeSubstitutions("K", simpleKName);
+        sr.addGenericTypeSubstitutions("V", simpleVName);
+        sr.addImport(fullKName);
+        sr.addImport(fullVName);
 
         // classes outside the local compilation unit need to be manually imported for now
         sr.addTargetType("LinkedHashMap.Entry");
@@ -137,15 +143,18 @@ public class TypeSpecialization {
         return specialize(sr);	
     }
     
-    // TODO - add support for fullEName
-    public static String specializeConcurrentHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
+    public static String specializeConcurrentHashMap(String jdkSources, String patchedSources, String fullKName, String fullVName) throws Exception {
     	String origPackage = "java.util.concurrent";
     	String origCompilationUnit = "ConcurrentHashMap";
-    	String genCompilationUnit = "ConcurrentHashMap" + K + V;
+    	String simpleKName = fullKName.substring(fullKName.lastIndexOf('.') + 1);
+    	String simpleVName = fullVName.substring(fullVName.lastIndexOf('.') + 1);
+    	String genCompilationUnit = "ConcurrentHashMap" + simpleKName + simpleVName;
         
         SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, origPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("K", K);
-        sr.addGenericTypeSubstitutions("V", V);
+        sr.addGenericTypeSubstitutions("K", simpleKName);
+        sr.addGenericTypeSubstitutions("V", simpleVName);
+        sr.addImport(fullKName);
+        sr.addImport(fullVName);
         return specialize(sr, new SpecializationVisitorConcurrentHashMap());
     }
 
