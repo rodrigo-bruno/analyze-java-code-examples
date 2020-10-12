@@ -1,14 +1,27 @@
 #!/bin/bash
 
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+source run.env
 
-javaparser=/home/rbruno/.gradle/caches/modules-2/files-2.1/com.github.javaparser/javaparser-core/3.15.13/7a2282962310f9a0d36d22464ee9c8f079667f04/javaparser-core-3.15.13.jar
-mainjar=build/libs/analyze-java-code-1.0-SNAPSHOT.jar
 testpackage=org.graalvm.datastructure.tests
 
-workdir="/tmp/org.graalvm.datastructure.specialization"
-patched=$workdir/patched/java.base
+# Note: this mkdir is necessary otherwise the JVM will not load classes from
+# this directory if it is not available at startup...
+mkdir -p gen/bin/java.base
 
-$JAVA_HOME/bin/java --patch-module java.base=$patched -cp $javaparser:$mainjar $testpackage.ArrayListTest
-$JAVA_HOME/bin/java --patch-module java.base=$patched -cp $javaparser:$mainjar $testpackage.HashMapTest
-$JAVA_HOME/bin/java --patch-module java.base=$patched -cp $javaparser:$mainjar $testpackage.ConcurrentHashMapTest
+function run_test {
+	test=$1
+	java \
+		-Djdksources=$jdksources \
+		-Dsrc_java_base=$src_java_base \
+		-Dbin_java_base=$bin_java_base \
+		--patch-module java.base=$bin_java_base \
+		-Xbootclasspath/a:$javaparser \
+		-Xbootclasspath/a:build/classes/java/main \
+		--add-reads java.base=ALL-UNNAMED \
+		-cp $javaparser:build/classes/java/main $testpackage.$test
+}
+
+run_test ArrayListTest
+run_test ArrayListTest2
+run_test HashMapTest
+run_test ConcurrentHashMapTest

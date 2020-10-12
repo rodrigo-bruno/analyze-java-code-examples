@@ -1,3 +1,5 @@
+*.swp
+*.log
 .project
 .settings
 .classpath
@@ -9,3 +11,4 @@ bin
 *.iws
 out
 build
+gen

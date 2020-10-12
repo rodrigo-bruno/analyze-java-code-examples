@@ -13,11 +13,9 @@ import java.util.Collection;
 
 public class SpecializedDataStructureFactory extends DataStructureFactory {
 
-	// TODO - make these configurable
-	private static String jdkSources = "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";
-	private static String workDir = "/tmp/org.graalvm.datastructure.specialization";
-	private static String patchedSrcPath = workDir + "/src/";
-	private static String patchedModPath = workDir + "/patched/java.base/";
+	private static String jdkSources = System.getProperty("jdksources") + "/";
+	private static String patchedSrcPath = System.getProperty("src_java_base") + "/";
+	private static String patchedModPath = System.getProperty("bin_java_base") + "/";
 
 	public static void compile(String[] filePaths) throws Exception {
         CompilationRequest.compile(patchedSrcPath, patchedModPath, filePaths);
@@ -28,7 +26,8 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 
 	private String setupArrayList(Class<?> parT) throws Exception {
 		String specializedClassName = "java.util.ArrayList" + parT.getSimpleName();
-		String specializedPath = TypeSpecialization.specializeArrayList(jdkSources, patchedSrcPath, parT.getSimpleName());
+		// TODO - getName for all
+		String specializedPath = TypeSpecialization.specializeArrayList(jdkSources, patchedSrcPath, parT.getName());
 		compile(new String[] { specializedPath });
 		return specializedClassName;
 	}
@@ -40,7 +39,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 			String specializedClassName = setupArrayList(parT);
 			return (AbstractList<T>) Class.forName(specializedClassName).getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ArrayList<T>();
 		}
 	}
@@ -52,7 +50,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 			String specializedClassName = setupArrayList(parT);
 			return (AbstractList<T>) Class.forName(specializedClassName).getDeclaredConstructor(int.class).newInstance(initialCapacity);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ArrayList<T>(initialCapacity);
 		}
 	}
@@ -64,7 +61,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 			String specializedClassName = setupArrayList(parT);
 			return (AbstractList<T>) Class.forName(specializedClassName).getDeclaredConstructor(Collection.class).newInstance(c);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ArrayList<T>(c);
 		}
 	}
@@ -81,7 +77,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 			compile(new String[] { hmSpecializedPath, lhmSpecializedPath });
 			return (AbstractMap<K,V>) Class.forName(hmClassName).getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new HashMap<K,V>();
 		}
 	}
@@ -95,7 +90,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 			compile(new String[] { specializedPath });
 			return (AbstractMap<K,V>) Class.forName(className).getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new ConcurrentHashMap<K,V>();
 		}
 	}

@@ -1,12 +1,13 @@
+package my.testpackage;
+
 import java.util.List;
 import java.util.ArrayListInteger;
 
-public class SpecializedArrayList {
+public class IntegerArrayList {
 
 	public static void main(String[] args) {
 		List<Integer> arrayInt = new ArrayListInteger();
 		System.out.println(arrayInt.getClass());
-		System.out.println(arrayInt);
 		arrayInt.add(1);
 		System.out.println(arrayInt);
 		arrayInt.add(2);

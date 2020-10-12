@@ -1,7 +1,9 @@
 package org.graalvm.datastructure.specialization;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 // Describes the specialization of a compilation unit.
 public class SpecializationRequest {
@@ -22,6 +24,8 @@ public class SpecializationRequest {
 	
 	private Map<String, String> targetTypes;
 	
+	private Set<String> imports;
+
 	private String suffix;
 	
 	public SpecializationRequest(
@@ -39,6 +43,7 @@ public class SpecializationRequest {
 		this.genCompilationUnit = genCompilationUnit;
 		this.genericTypesSubstitutions = new HashMap<>();
 		this.targetTypes = new HashMap<>();
+		this.imports = new HashSet<>();
 		this.suffix = "";
 	}
 
@@ -74,6 +79,10 @@ public class SpecializationRequest {
 		return targetTypes;
 	}
 	
+	public Set<String> getImports() {
+		return imports;
+	}
+
 	public void addGenericTypeSubstitutions(String generic, String substitution) {
 		genericTypesSubstitutions.put(generic, substitution);
 		suffix = suffix + substitution;
@@ -90,5 +99,9 @@ public class SpecializationRequest {
 		
 		result = result + splits[i] + suffix;
 		targetTypes.put(type, result);
+	}
+
+	public void addImport(String type) {
+		imports.add(type);
 	}
 }

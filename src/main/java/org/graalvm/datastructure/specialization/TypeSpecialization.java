@@ -51,6 +51,11 @@ public class TypeSpecialization {
    	
         // deletes unnecessary casts
     	checkUnnecessaryCasts(cu);
+    	
+    	// add requested imports
+    	for (String i : sr.getImports()) {
+    		cu.addImport(i);
+    	}
 
         // creating java file
     	ensureDirectoryExists(filePath);
@@ -85,17 +90,19 @@ public class TypeSpecialization {
     	return specialize(sr, new SpecializationVisitor());
     }
     
-    public static String specializeArrayList(String jdkSources, String patchedSources, String E) throws Exception {
+    public static String specializeArrayList(String jdkSources, String patchedSources, String fullEName) throws Exception {
     	String origPackage = "java.util";
     	String origCompilationUnit = "ArrayList";
-    	String genCompilationUnit = "ArrayList" + E;
+    	String simpleEName = fullEName.substring(fullEName.lastIndexOf('.') + 1);
+    	String genCompilationUnit = "ArrayList" + simpleEName;
         
     	SpecializationRequest sr = new SpecializationRequest(jdkSources, patchedSources, origPackage, origPackage, origCompilationUnit, genCompilationUnit);
-    	sr.addGenericTypeSubstitutions("E", E);
-
+    	sr.addGenericTypeSubstitutions("E", simpleEName);
+    	sr.addImport(fullEName);
         return specialize(sr);	
     }
 
+    // TODO - add support for fullEName
     public static String specializeHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
     	String origPackage = "java.util";
     	String origCompilationUnit = "HashMap";
@@ -110,7 +117,8 @@ public class TypeSpecialization {
         sr.addTargetType("LinkedHashMap.Entry");
         return specialize(sr);	
     }
-    
+
+    // TODO - add support for fullEName
     public static String specializeLinkedHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
     	String origPackage = "java.util";
     	String origCompilationUnit = "LinkedHashMap";
@@ -129,6 +137,7 @@ public class TypeSpecialization {
         return specialize(sr);	
     }
     
+    // TODO - add support for fullEName
     public static String specializeConcurrentHashMap(String jdkSources, String patchedSources, String K, String V) throws Exception {
     	String origPackage = "java.util.concurrent";
     	String origCompilationUnit = "ConcurrentHashMap";
@@ -139,25 +148,12 @@ public class TypeSpecialization {
         sr.addGenericTypeSubstitutions("V", V);
         return specialize(sr, new SpecializationVisitorConcurrentHashMap());
     }
-    
-    public static void specializeASimpleCLass() throws Exception {
-    	String origSourcePath = "/home/rbruno/git/analyze-java-code-examples/src/main/resources/";
-    	String origPackage = "examples.source";
-    	String origCompilationUnit = "ASimpleClass";
-    	String genCompilationUnit = "ASimpleClassInteger";
-        
-        SpecializationRequest sr = new SpecializationRequest(origSourcePath, origSourcePath, origPackage, origPackage, origCompilationUnit, genCompilationUnit);
-        sr.addGenericTypeSubstitutions("T", "Integer");
-        sr.addTargetType("ASimpleClass");
-        specialize(sr);	
-    }
-    
-    // Syntax: java TypeSpecialization [<path to jdk sources> [<path where generated files will be placed>]] 
+
+    // Syntax: java TypeSpecialization <path to jdk sources> <generated src java.base> <generated bin java.base> 
     public static void main(String[] args) throws Exception {
-    	String jdkSources = args.length > 0 ? args[0] : "/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes/";    	
-    	String workDir = args.length > 1 ? args[1] : "/tmp/org.graalvm.datastructure.specialization";
-    	String patchedSrcPath = workDir + "/src/";
-    	String patchedModPath = workDir + "/patched/java.base/";
+    	String jdkSources = args[0] + "/";    	
+    	String patchedSrcPath = args[1] + "/";
+    	String patchedModPath = args[2] + "/";
     	
     	System.out.println("Loaded JDK sources come from " + jdkSources);
     	System.out.println("Generated source code will be placed in " + patchedSrcPath);
@@ -174,9 +170,7 @@ public class TypeSpecialization {
     	
     	String sConcurrentHashMap = specializeConcurrentHashMap(jdkSources, patchedSrcPath, "Integer", "Integer");
     	System.out.println("Generated " + sConcurrentHashMap);
-    	
-    	//String sASimpleClass = specializeASimpleCLass();
-    	
+
     	CompilationRequest.compile(
     			patchedSrcPath,
     			patchedModPath, 
