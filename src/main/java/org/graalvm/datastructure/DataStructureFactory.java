@@ -8,24 +8,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * One way would be:
- * ArrayList<Integer> = new @specialize(Integer.class) ArrayList<>(); -> This would fail because we cannot specialize when the left side is a final class
- * AbstractList<Integer> = new @specialize(Integer.class) ArrayList<>(); -> this would work
- *
- * A second way would be
- * AbstractList<Integer> = graalvm.collections.SpecializedCollectionFactory.newArrayList(Integer.class)
- */
+public abstract class DataStructureFactory {
 
-public class DataStructureFactory {
-
-	static {
-		instance = new SpecializedDataStructureFactory();
-	}
-
-	static public DataStructureFactory instance;
+	static private DataStructureFactory instance;
 
 	protected DataStructureFactory() { }
+
+	public static void setInstance(DataStructureFactory impl) {
+		instance = impl;
+	}
+
+	public static DataStructureFactory getInstance() {
+		if  (instance == null) {
+			instance = new SpecializedDataStructureFactory();
+		}
+		return instance;
+	}
 
 	public <T> AbstractList<T> ArrayList(Class<T> parameterT) {
 		return new ArrayList<T>();

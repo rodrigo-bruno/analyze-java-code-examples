@@ -249,7 +249,7 @@ public class SpecializationVisitor implements VoidVisitor<SpecializationRequest>
 		for (int i = types.length - 1; i >= 0; i--) {
 			c.setName(types[i]);
 			
-			if (c.getScope().isEmpty()) {
+			if (!c.getScope().isPresent()) {
 				break;
 			} else {
 				c = c.getScope().get();	
@@ -261,7 +261,7 @@ public class SpecializationVisitor implements VoidVisitor<SpecializationRequest>
 		NodeList<Type> newlist = new NodeList<>();
 		int numGenericTypeSubsLeft = arg.getGenericTypesSubstitutions().size();
 		
-		if (n.getTypeArguments().isEmpty()) {
+		if (!n.getTypeArguments().isPresent()) {
 			return;
 		}
 		

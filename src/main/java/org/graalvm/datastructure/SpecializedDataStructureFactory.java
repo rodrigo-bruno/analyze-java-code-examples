@@ -26,7 +26,6 @@ public class SpecializedDataStructureFactory extends DataStructureFactory {
 
 	private String setupArrayList(Class<?> parT) throws Exception {
 		String specializedClassName = "java.util.ArrayList" + parT.getSimpleName();
-		// TODO - getName for all
 		String specializedPath = TypeSpecialization.specializeArrayList(jdkSources, patchedSrcPath, parT.getName());
 		compile(new String[] { specializedPath });
 		return specializedClassName;

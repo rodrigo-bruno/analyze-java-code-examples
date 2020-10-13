@@ -7,7 +7,7 @@ import org.graalvm.datastructure.DataStructureFactory;
 public class HashMapTest {
 	
 	public static void test1() {
-		Map<Integer, String> map = DataStructureFactory.instance.HashMap(Integer.class, String.class);
+		Map<Integer, String> map = DataStructureFactory.getInstance().HashMap(Integer.class, String.class);
 		System.out.println(map.getClass());
 		System.out.println(map);
 		map.put(123, "321");
@@ -19,7 +19,7 @@ public class HashMapTest {
 	}
 	
 	public static void test2() {
-		Map<String, Point> map = DataStructureFactory.instance.HashMap(String.class, Point.class);
+		Map<String, Point> map = DataStructureFactory.getInstance().HashMap(String.class, Point.class);
 		System.out.println(map.getClass());
 		System.out.println(map);
 		map.put("00", new Point(0,0));

@@ -8,7 +8,7 @@ import org.graalvm.datastructure.DataStructureFactory;
 public class ArrayListTest {
 
 	public static void test1() {
-		List<Integer> arrayInt = DataStructureFactory.instance.ArrayList(Integer.class);
+		List<Integer> arrayInt = DataStructureFactory.getInstance().ArrayList(Integer.class);
 		System.out.println(arrayInt.getClass());
 		System.out.println(arrayInt);
 		arrayInt.add(1);
@@ -20,7 +20,7 @@ public class ArrayListTest {
 	}
 
 	public static void test2() {
-		List<Integer> arrayInt = DataStructureFactory.instance.ArrayList(Integer.class, 3);
+		List<Integer> arrayInt = DataStructureFactory.getInstance().ArrayList(Integer.class, 3);
 		System.out.println(arrayInt.getClass());
 		System.out.println(arrayInt);
 		arrayInt.add(1);
@@ -35,13 +35,13 @@ public class ArrayListTest {
 		List<Integer> arrayInt = new ArrayList<>();
 		arrayInt.add(1);
 		arrayInt.add(2);
-		List<Integer> arrayInt2 = DataStructureFactory.instance.ArrayList(Integer.class, arrayInt);
+		List<Integer> arrayInt2 = DataStructureFactory.getInstance().ArrayList(Integer.class, arrayInt);
 		System.out.println(arrayInt2.getClass());
 		System.out.println(arrayInt2);
 	}
 	
 	public static void test4() {
-		List<Point> array = DataStructureFactory.instance.ArrayList(Point.class);
+		List<Point> array = DataStructureFactory.getInstance().ArrayList(Point.class);
 		System.out.println(array.getClass());
 		array.add(new Point(0, 0));
 		System.out.println(array);
