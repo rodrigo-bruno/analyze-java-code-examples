@@ -1,0 +1,6 @@
+{
+  "value_fields" : {
+    "java.util.HashMapIntegerString$NodeIntegerString" : ["key", "value"],
+    "java.util.HashMapStringResult$NodeStringResult" : ["key", "value"]
+  }
+}

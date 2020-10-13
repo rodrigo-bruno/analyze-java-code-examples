@@ -9,7 +9,7 @@ apply plugin: "maven"
 
 mainClassName = "org.graalvm.datastructure.specialization.TypeSpecialization"
 
-sourceCompatibility = 11
+sourceCompatibility = 8
 
 repositories {
     mavenCentral()

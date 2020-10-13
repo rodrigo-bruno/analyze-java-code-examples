@@ -7,12 +7,12 @@ src_java_base=gen/src/java.base
 bin_java_base=gen/bin/java.base
 
 # Compile necessary classes to run the specialization.
-javac -cp $specializationjar -d bin src/my/testpackage/Point.java
-javac -cp $specializationjar -d bin src/my/testpackage/SetupSpecialization.java
+javac -cp $specializationjar -d bin src/my/testpackage/*.java
 
 # Create (.java) and compile (.class) specialized data structures.
-java --patch-module java.base=$workdir/patched/java.base -cp $javaparser:$specializationjar:bin my.testpackage.SetupSpecialization $jdksources $src_java_base $bin_java_base
+java -cp $javaparser:$specializationjar:bin my.testpackage.SetupSpecialization $jdksources $src_java_base $bin_java_base
 
-# Compile tests.
-javac -cp bin --add-reads java.base=ALL-UNNAMED --patch-module java.base=$bin_java_base -d bin src/my/testpackage/PointArrayList.java
-javac -cp bin --add-reads java.base=ALL-UNNAMED --patch-module java.base=$bin_java_base -d bin src/my/testpackage/IntegerArrayList.java
+# Compile specialized factory. 
+# TODO - generate automatically
+# If needed to update inside jar, use: jar -uf $optimized_jar -C gen/bin/unnamed com/oracle/DataStructureFactory.class 
+javac -cp bin --add-reads java.base=ALL-UNNAMED --patch-module java.base=$bin_java_base -d bin DataStructureFactory.java

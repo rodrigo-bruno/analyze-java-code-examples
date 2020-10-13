@@ -1,12 +1,11 @@
 package my.testpackage;
 
 import java.util.List;
-import java.util.ArrayListPoint;
 
 public class PointArrayList {
 
 	public static void main(String[] args) throws Exception {
-		List<Point> array = new ArrayListPoint();
+		List<Point> array = DataStructureFactory.ArrayList(Point.class);
 		System.out.println(array.getClass());
 		System.out.println(array);
                 Point p = new Point(0, 0);

@@ -6,9 +6,8 @@ import org.graalvm.datastructure.utils.CompilationRequest;
 public class SetupSpecialization {
     public static void main(String[] args) throws Exception {
         String jdkSources = args[0] + "/";    	
-        //String workDir = args.length > 1 ? args[1] : "/tmp/org.graalvm.datastructure.specialization";
-        String patchedSrcPath = args[1] + "/";  //workDir + "/src/";
-        String patchedModPath = args[2] + "/"; //workDir + "/patched/java.base/";
+        String patchedSrcPath = args[1] + "/";
+        String patchedModPath = args[2] + "/";
     	
         System.out.println("Loaded JDK sources come from " + jdkSources);
         System.out.println("Generated source code will be placed in " + patchedSrcPath);
@@ -26,6 +25,10 @@ public class SetupSpecialization {
 		    			sIntegerArrayList, 
 		    			sPointArrayList, 
     			});
+
+        // TODO - generate a new factory
+        
+
     	System.out.println("Compiled all generated sources!");
     }
 }
