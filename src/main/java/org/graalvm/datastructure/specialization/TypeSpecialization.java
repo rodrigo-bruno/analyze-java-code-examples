@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.graalvm.datastructure.AOTSpecializedDataStructureFactory;
 import org.graalvm.datastructure.utils.CompilationRequest;
 
 import com.github.javaparser.StaticJavaParser;
@@ -24,7 +26,7 @@ public class TypeSpecialization {
     	return sourcepath + fullclassname.replace(".", "/") + ".java";
     }
 
-    private static void ensureDirectoryExists(String filePath) throws IOException {
+    public static void ensureDirectoryExists(String filePath) throws IOException {
     	Files.createDirectories(Paths.get(filePath).getParent());
     }
     
@@ -158,37 +160,58 @@ public class TypeSpecialization {
         return specialize(sr, new SpecializationVisitorConcurrentHashMap());
     }
 
-    // Syntax: java TypeSpecialization <path to jdk sources> <generated src java.base> <generated bin java.base> 
+    // Syntax: java TypeSpecialization <path to jdk sources> <generated src> <generated bin> [<specializations> <...>]
     public static void main(String[] args) throws Exception {
     	String jdkSources = args[0] + "/";    	
-    	String patchedSrcPath = args[1] + "/";
-    	String patchedModPath = args[2] + "/";
-    	
-    	System.out.println("Loaded JDK sources come from " + jdkSources);
-    	System.out.println("Generated source code will be placed in " + patchedSrcPath);
-    	System.out.println("Generated class files will be placed in " + patchedModPath);
-    	
-    	String sArrayList = specializeArrayList(jdkSources, patchedSrcPath, "Integer");
-    	System.out.println("Generated " + sArrayList);
-    	
-    	String sHashMap = specializeHashMap(jdkSources, patchedSrcPath, "String", "String");
-    	System.out.println("Generated " + sHashMap);
-    	
-    	String sLinkedHashMap =specializeLinkedHashMap(jdkSources, patchedSrcPath, "String", "String");
-    	System.out.println("Generated " + sLinkedHashMap);
-    	
-    	String sConcurrentHashMap = specializeConcurrentHashMap(jdkSources, patchedSrcPath, "Integer", "Integer");
-    	System.out.println("Generated " + sConcurrentHashMap);
+    	String srcJavaBase = args[1] + "/java.base/";
+    	String binJavaBase = args[2] + "/java.base/";
+    	String srcUnnamedPath = args[1] + "/unnamed";
+    	String binUnnamedPath = args[2] + "/unnamed";
+    	ArrayList<String> compileRequestsJavaBase = new ArrayList<>();
+    	ArrayList<String> compileRequestsUnnamed = new ArrayList<>();
+    	AOTSpecializedDataStructureFactory aotfactor = new AOTSpecializedDataStructureFactory(srcUnnamedPath);
 
-    	CompilationRequest.compile(
-    			patchedSrcPath,
-    			patchedModPath, 
-    			new String[] { 
-		    			sArrayList, 
-		    			sHashMap, 
-		    			sLinkedHashMap, 
-		    			sConcurrentHashMap 
-    			});
+    	System.out.println("Loaded JDK sources come from " + jdkSources);
+    	System.out.println("Generated java.base source code will be placed in " + srcJavaBase);
+    	System.out.println("Generated java.base class files will be placed in " + binJavaBase);
+    	System.out.println("Factory source and class will be placed in " + srcUnnamedPath);
+    	
+    	for (int i = 3; i < args.length; i++) {
+    		String specializationRequest = args[i];
+    		String type = specializationRequest.split("<")[0];
+    		String[] parameters = specializationRequest.split("<")[1].replace(">", "").replaceAll(" ", "").split(",");
+    		
+    		switch (type) {
+    		case "java.util.ArrayList":
+    	    	compileRequestsJavaBase.add(specializeArrayList(jdkSources, srcJavaBase, parameters[0]));
+    	    	aotfactor.addParameterArrayList(parameters[0]);
+    	    	break;
+    		case "java.util.HashMap":
+    			compileRequestsJavaBase.add(specializeHashMap(jdkSources, srcJavaBase, parameters[0], parameters[1]));
+    			compileRequestsJavaBase.add(specializeLinkedHashMap(jdkSources, srcJavaBase, parameters[0], parameters[1]));
+    			aotfactor.addParameterHashMap(parameters[0], parameters[1]);
+    	    	break;
+    		case "java.util.concurrent.ConcurrentHashMap":
+    			compileRequestsJavaBase.add(specializeConcurrentHashMap(jdkSources, srcJavaBase, parameters[0], parameters[1]));
+    			aotfactor.addParameterConcurrentHashMap(parameters[0], parameters[1]);
+    			break;
+    		default:
+    			System.out.println(String.format("%s not yet supported...", specializationRequest));
+    		}
+    	}
+
+    	compileRequestsUnnamed.add(aotfactor.generate());
+    	
+    	for (String compileRequest : compileRequestsJavaBase) {
+    		System.out.println("Generated " + compileRequest);
+    	}
+    	for (String compileRequest : compileRequestsUnnamed) {
+    		System.out.println("Generated " + compileRequest);
+    	}
+    	
+    	CompilationRequest.compile(srcJavaBase, binJavaBase, compileRequestsJavaBase.toArray(new String[0]));
+    	CompilationRequest.compile(srcJavaBase, binUnnamedPath, compileRequestsUnnamed.toArray(new String[0]));
+    	
     	System.out.println("Compiled all generated sources!");
     }
 }

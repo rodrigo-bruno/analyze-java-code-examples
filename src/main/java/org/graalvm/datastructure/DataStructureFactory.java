@@ -8,68 +8,53 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class DataStructureFactory {
+public class DataStructureFactory {
 
-	static private DataStructureFactory instance;
-
-	protected DataStructureFactory() { }
-
-	public static void setInstance(DataStructureFactory impl) {
-		instance = impl;
-	}
-
-	public static DataStructureFactory getInstance() {
-		if  (instance == null) {
-			instance = new SpecializedDataStructureFactory();
-		}
-		return instance;
-	}
-
-	public <T> AbstractList<T> ArrayList(Class<T> parameterT) {
+	public static <T> AbstractList<T> ArrayList(Class<T> parameterT) {
 		return new ArrayList<T>();
 	}
 
-	public <T> AbstractList<T> ArrayList(Class<T> parameterT, int initialCapacity) {
+	public static <T> AbstractList<T> ArrayList(Class<T> parameterT, int initialCapacity) {
 		return new ArrayList<T>(initialCapacity);
 	}
 
-	public <T> AbstractList<T> ArrayList(Class<T> parameterT, Collection<? extends T> c) {
+	public static <T> AbstractList<T> ArrayList(Class<T> parameterT, Collection<? extends T> c) {
 		return new ArrayList<T>(c);
 	}
 
-	public <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV) {
+	public static <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV) {
 		return new HashMap<K,V>();
 	}
 
-	public <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity) {
+	public static <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity) {
 		return new HashMap<K,V>(initialCapacity);
 	}
 
-	public <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor) {
+	public static <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor) {
 		return new HashMap<K,V>(initialCapacity, loadFactor);
 	}
 
-	public <K,V> AbstractMap<K,V> HashMap(Map<? extends K, ? extends V> m) {
+	public static <K,V> AbstractMap<K,V> HashMap(Class<K> parameterK, Class<V> parameterV, Map<? extends K, ? extends V> m) {
 		return new HashMap<K,V>(m);
 	}
 
-	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV) {
+	public static <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV) {
 		return new ConcurrentHashMap<K,V>();
 	}
 
-	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity) {
+	public static <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity) {
 		return new ConcurrentHashMap<K,V>(initialCapacity);
 	}
 
-	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, Map<? extends K, ? extends V> m) {
-		return new ConcurrentHashMap<K,V>(m);
-	}
-
-	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor) {
+	public static <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor) {
 		return new ConcurrentHashMap<K,V>(initialCapacity, loadFactor);
 	}
 
-	public <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor, int concurrencyLevel) {
+	public static <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, int initialCapacity, float loadFactor, int concurrencyLevel) {
 		return new ConcurrentHashMap<K,V>(initialCapacity, loadFactor, concurrencyLevel);
+	}
+
+	public static <K,V> AbstractMap<K,V> ConcurrentHashMap(Class<K> parameterK, Class<V> parameterV, Map<? extends K, ? extends V> m) {
+		return new ConcurrentHashMap<K,V>(m);
 	}
 }

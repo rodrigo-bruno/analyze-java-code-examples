@@ -1,17 +1,15 @@
 #!/bin/bash
 
+specializationjar=../build/libs/analyze-java-code-1.0-SNAPSHOT.jar
 JAVA_HOME=$HOME/git-oracle/graal/sdk/latest_graalvm_home
 
-patched=gen/bin/java.base
+classpath="bin:gen/bin/unnamed:$specializationjar"
 
-specializationflags="-J--patch-module -Jjava.base=$patched -J-Xbootclasspath/a:bin -J--add-reads -Jjava.base=ALL-UNNAMED"
+specializationflags="-J--patch-module -Jjava.base=gen/bin/java.base -J-Xbootclasspath/a:$classpath -J--add-reads -Jjava.base=ALL-UNNAMED"
 
-$JAVA_HOME/bin/native-image $specializationflags -cp bin my.testpackage.PointArrayList
-./my.testpackage.pointarraylist
+$JAVA_HOME/bin/native-image $specializationflags -cp $classpath my.testpackage.TestingSpecializedDataStructures
+./my.testpackage.testingspecializeddatastructures
 
-$JAVA_HOME/bin/native-image $specializationflags -cp bin my.testpackage.IntegerArrayList
-./my.testpackage.integerarraylist
 
-# TODO - add an example with a Hashmap so that we can actually use the config
 #$JAVA_HOME/bin/native-image $specializationflags -H:ConfigurationFileDirectories=./config -cp bin my.testpackage.PointArrayList
 #./my.testpackage.PointArrayList
