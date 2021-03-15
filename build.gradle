@@ -6,6 +6,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin:'application'
 apply plugin: "maven"
+apply plugin: 'maven-publish'
 
 mainClassName = "org.graalvm.datastructure.specialization.TypeSpecialization"
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 specializationjar=../build/libs/analyze-java-code-1.0-SNAPSHOT.jar
-javaparser=/home/rbruno/.gradle/caches/modules-2/files-2.1/com.github.javaparser/javaparser-core/3.15.13/7a2282962310f9a0d36d22464ee9c8f079667f04/javaparser-core-3.15.13.jar
+javaparser=/home/rbruno/.m2/repository/com/github/javaparser/javaparser-core/3.15.13/javaparser-core-3.15.13.jar
 jdksources=/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes
 
 # Compile application.
