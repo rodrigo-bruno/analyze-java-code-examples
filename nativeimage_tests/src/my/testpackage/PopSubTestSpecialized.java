@@ -1,20 +1,16 @@
 package my.testpackage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayListPoint;
 import java.util.Random;
 
-import org.graalvm.datastructure.DataStructureFactory;
-
-public class PopSubTest {
+public class PopSubTestSpecialized {
 
     public static void main(String[] args) {
         int runCount = 100_000;
         int objectCount = 1_000;
         long[] times = new long[runCount];
         Random random = new Random();
-        List<Point> popQueue = DataStructureFactory.ArrayList(Point.class, objectCount);
+        ArrayListPoint popQueue = new ArrayListPoint(objectCount);
 
         System.out.println(String.format("Using %s", popQueue.getClass()));
 
@@ -25,9 +21,9 @@ public class PopSubTest {
         }
 
         // Create the sub queues
-        List<Point> subQueues0 = DataStructureFactory.ArrayList(Point.class, objectCount);
-        List<Point> subQueues1 = DataStructureFactory.ArrayList(Point.class, objectCount);
-        List<Point> subQueues2 = DataStructureFactory.ArrayList(Point.class, objectCount);
+        ArrayListPoint subQueues0 = new ArrayListPoint(objectCount);
+        ArrayListPoint subQueues1 = new ArrayListPoint(objectCount);
+        ArrayListPoint subQueues2 = new ArrayListPoint(objectCount);
 
         // Execute the experiments
         for (int run = 0; run < runCount; ++run) {
