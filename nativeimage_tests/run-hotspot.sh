@@ -34,13 +34,22 @@ function pubsub {
 
 function arrayops {
 	# Running ArrayRead (vanilla)
-	$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayRead &> arrayread-vanilla.log
+	#$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayRead &> arrayread-vanilla.log
 
 	# Running ArrayRead (specialized-user)
-	$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.ArrayReadSpecialized &> arrayread-user-specialized.log
+	#$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.ArrayReadSpecialized &> arrayread-user-specialized.log
+
+	# Running ArrayWrite (vanilla)
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:arraywrite-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayWrite &> arraywrite-vanilla.log
+
+	# Running ArrayWrite (specialized-user)
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:arraywrite-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.ArrayWriteSpecialized &> arraywrite-user-specialized.log
+
 
 	# Result processing for Array
-	cat arrayread-vanilla.log          | grep "took" | awk '{print $4}' > arrayread-vanilla.dat
-	cat arrayread-user-specialized.log | grep "took" | awk '{print $4}' > arrayread-user-specialized.dat
+	cat arrayread-vanilla.log           | grep "took" | awk '{print $4}' > arrayread-vanilla.dat
+	cat arrayread-user-specialized.log  | grep "took" | awk '{print $4}' > arrayread-user-specialized.dat
+	cat arraywrite-vanilla.log          | grep "took" | awk '{print $4}' > arraywrite-vanilla.dat
+	cat arraywrite-user-specialized.log | grep "took" | awk '{print $4}' > arraywrite-user-specialized.dat
 }
 arrayops
