@@ -12,3 +12,7 @@ bin
 out
 build
 gen
+*.jvm
+*.jvm.*
+*.dat
+*.png
