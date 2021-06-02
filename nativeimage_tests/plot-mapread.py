@@ -3,14 +3,14 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-vanilla =          np.loadtxt("arraywrite-vanilla.dat", dtype=float)
-user_specialized = np.loadtxt("arraywrite-user-specialized.dat", dtype=float)
+vanilla =          np.loadtxt("mapread-vanilla.dat", dtype=float)
+user_specialized = np.loadtxt("mapread-user-specialized.dat", dtype=float)
 
 fig = plt.figure()
 plt.plot(user_specialized, label='User-Specialized')
 plt.plot(vanilla, label = 'Vanilla')
 plt.legend()
-fig.savefig("arraywrite-all.png")
+fig.savefig("mapread-all.png")
 
 vanilla          = vanilla[40000:80000]
 user_specialized = user_specialized[40000:80000]
@@ -37,6 +37,6 @@ plt.ylim(ymin=0)
 plt.ylabel('Time (ns) for 1k ops')
 plt.xlabel('Samples')
 plt.legend()
-fig.savefig("arraywrite-warmed.png")
+fig.savefig("mapready-warmed.png")
 
 

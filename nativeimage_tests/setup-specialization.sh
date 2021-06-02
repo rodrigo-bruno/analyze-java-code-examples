@@ -18,5 +18,6 @@ java \
 	"java.util.ArrayList<my.testpackage.Point>" \
 	"java.util.HashMap<Integer, String>" \
 	"java.util.HashMap<String, my.testpackage.Point>" \
+	"java.util.HashMap<Integer, my.testpackage.Point>" \
 	"java.util.concurrent.ConcurrentHashMap<Integer,String>" \
 	"java.util.concurrent.ConcurrentHashMap<String,my.testpackage.Point>"

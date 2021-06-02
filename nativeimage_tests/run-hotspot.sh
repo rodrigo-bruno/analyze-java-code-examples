@@ -52,4 +52,26 @@ function arrayops {
 	cat arraywrite-vanilla.log          | grep "took" | awk '{print $4}' > arraywrite-vanilla.dat
 	cat arraywrite-user-specialized.log | grep "took" | awk '{print $4}' > arraywrite-user-specialized.dat
 }
-arrayops
+#arrayops
+
+function mapops {
+	# Running MapRead (vanilla)
+	#$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-vanilla.jvm -cp bin:$specializationjar my.testpackage.MapRead &> mapread-vanilla.log
+
+	# Running MapRead (specialized-user)
+	#$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.MapReadSpecialized &> mapread-user-specialized.log
+
+	# Running MapWrite (vanilla)
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:mapwrite-vanilla.jvm -cp bin:$specializationjar my.testpackage.MapWrite &> mapwrite-vanilla.log
+
+	# Running MapWrite (specialized-user)
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:mapwrite-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.MapWriteSpecialized &> mapwrite-user-specialized.log
+
+	# Result processing for Map
+	cat mapread-vanilla.log           | grep "took" | awk '{print $4}' > mapread-vanilla.dat
+	cat mapread-user-specialized.log  | grep "took" | awk '{print $4}' > mapread-user-specialized.dat
+	cat mapwrite-vanilla.log          | grep "took" | awk '{print $4}' > mapwrite-vanilla.dat
+	cat mapwrite-user-specialized.log | grep "took" | awk '{print $4}' > mapwrite-user-specialized.dat
+
+}
+mapops
