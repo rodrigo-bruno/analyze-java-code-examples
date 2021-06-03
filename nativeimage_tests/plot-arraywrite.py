@@ -21,14 +21,21 @@ print("mean(user_specialized): ", np.mean(user_specialized))
 print("median(vanilla): ",          np.median(vanilla))
 print("median(user_specialized): ", np.median(user_specialized))
 
-print("p75(vanilla): ",             np.percentile(vanilla, 75))
-print("p75(user_specialized): ",    np.percentile(user_specialized, 75))
+print("p99(vanilla): ",             np.percentile(vanilla, 99))
+print("p99(user_specialized): ",    np.percentile(user_specialized, 99))
 
-vanilla[vanilla > np.percentile(vanilla, 75)] = np.nan
-user_specialized[user_specialized > np.percentile(user_specialized, 75)] = np.nan
+vanilla[vanilla > np.percentile(vanilla, 99)] = np.nan
+user_specialized[user_specialized > np.percentile(user_specialized, 99)] = np.nan
 
 print("mean after correction(vanilla): ",          np.nanmean(vanilla))
 print("mean after correction(user_specialized): ", np.nanmean(user_specialized))
+
+tput_vanilla          = 10000/vanilla*1000
+tput_user_specialized = 10000/user_specialized*1000
+print("mean tput after correction(vanilla): "         , np.nanmean(tput_vanilla))
+print("mean tput after correction(user_specialized): ", np.nanmean(tput_user_specialized))
+print("std tput after correction(vanilla): ",          np.nanstd(tput_vanilla))
+print("std tput after correction(user_specialized): ", np.nanstd(tput_user_specialized))
 
 fig = plt.figure()
 plt.plot(user_specialized, label='User-Specialized')
