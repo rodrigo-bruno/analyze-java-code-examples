@@ -1,7 +1,6 @@
 #!/bin/bash
 
 specializationjar=../build/libs/analyze-java-code-1.0-SNAPSHOT.jar
-#JAVA_HOME=$HOME/git-oracle/graal/sdk/latest_graalvm_home
 JAVA_HOME=$HOME/software/labsjdk-ce-11.0.8-jvmci-20.2-b03/
 
 classpath="bin:gen/bin/unnamed:$specializationjar"
@@ -11,9 +10,6 @@ jvmopts="-XX:+UseSerialGC -Xmx256m -Xms256m"
 
 # Build the application
 $JAVA_HOME/bin/javac -cp $classpath --add-reads java.base=ALL-UNNAMED --patch-module java.base=gen/bin/java.base -d bin src/my/testpackage/*.java
-
-# Running TestingSpecializedDataStructures
-#$JAVA_HOME/bin/java $specopts -cp $classpath my.testpackage.TestingSpecializedDataStructures
 
 function pubsub {
 	# Running PopSub (vanilla)
@@ -30,14 +26,14 @@ function pubsub {
 	cat popsub-specialized.log      | grep "took" | awk '{print $4}' > popsub-specialized.dat
 	cat popsub-user-specialized.log | grep "took" | awk '{print $4}' > popsub-user-specialized.dat
 }
-#pubsub
+pubsub
 
 function arrayops {
 	# Running ArrayRead (vanilla)
-	#$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayRead &> arrayread-vanilla.log
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayRead &> arrayread-vanilla.log
 
 	# Running ArrayRead (specialized-user)
-	#$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.ArrayReadSpecialized &> arrayread-user-specialized.log
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:arrayread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.ArrayReadSpecialized &> arrayread-user-specialized.log
 
 	# Running ArrayWrite (vanilla)
 	$JAVA_HOME/bin/java $jvmopts -Xloggc:arraywrite-vanilla.jvm -cp bin:$specializationjar my.testpackage.ArrayWrite &> arraywrite-vanilla.log
@@ -52,14 +48,14 @@ function arrayops {
 	cat arraywrite-vanilla.log          | grep "took" | awk '{print $4}' > arraywrite-vanilla.dat
 	cat arraywrite-user-specialized.log | grep "took" | awk '{print $4}' > arraywrite-user-specialized.dat
 }
-#arrayops
+arrayops
 
 function mapops {
 	# Running MapRead (vanilla)
-	#$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-vanilla.jvm -cp bin:$specializationjar my.testpackage.MapRead &> mapread-vanilla.log
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-vanilla.jvm -cp bin:$specializationjar my.testpackage.MapRead &> mapread-vanilla.log
 
 	# Running MapRead (specialized-user)
-	#$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.MapReadSpecialized &> mapread-user-specialized.log
+	$JAVA_HOME/bin/java $jvmopts -Xloggc:mapread-user-specialized.jvm $specopts -cp bin:$specializationjar my.testpackage.MapReadSpecialized &> mapread-user-specialized.log
 
 	# Running MapWrite (vanilla)
 	$JAVA_HOME/bin/java $jvmopts -Xloggc:mapwrite-vanilla.jvm -cp bin:$specializationjar my.testpackage.MapWrite &> mapwrite-vanilla.log
