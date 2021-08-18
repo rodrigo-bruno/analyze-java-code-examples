@@ -1,8 +1,0 @@
-{
-  "value_fields" : {
-    "java.util.HashMapIntegerString$NodeIntegerString" : ["key", "value"],
-    "java.util.HashMapStringPoint$NodeStringPoint" : ["key", "value"],
-    "java.util.concurrent.ConcurrentHashMapIntegerString$NodeIntegerString" : ["key"],
-    "java.util.concurrent.ConcurrentHashMapStringPoint$NodeStringPoint" : ["key"]
-  }
-}
