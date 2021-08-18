@@ -34,16 +34,16 @@ vanilla[vanilla > np.percentile(vanilla, 99)] = np.nan
 specialized[specialized > np.percentile(specialized, 99)] = np.nan
 user_specialized[user_specialized > np.percentile(user_specialized, 99)] = np.nan
 
-print("mean after correction(vanilla): ",          np.nanmean(vanilla))
-print("mean after correction(specialized): ",      np.nanmean(specialized))
-print("mean after correction(user_specialized): ", np.nanmean(user_specialized))
+print("final mean (vanilla): ",          np.nanmean(vanilla))
+print("final mean (specialized): ",      np.nanmean(specialized))
+print("final mean (user_specialized): ", np.nanmean(user_specialized))
 
 tput_vanilla          = 1000/vanilla*1000
 tput_user_specialized = 1000/user_specialized*1000
-print("mean tput after correction(vanilla): "         , np.nanmean(tput_vanilla))
-print("mean tput after correction(user_specialized): ", np.nanmean(tput_user_specialized))
-print("std tput after correction(vanilla): ",          np.nanstd(tput_vanilla))
-print("std tput after correction(user_specialized): ", np.nanstd(tput_user_specialized))
+print("final mean tput (vanilla): "         , np.nanmean(tput_vanilla))
+print("final mean tput (user_specialized): ", np.nanmean(tput_user_specialized))
+print("final std tput (vanilla): ",          np.nanstd(tput_vanilla))
+print("final std tput (user_specialized): ", np.nanstd(tput_user_specialized))
 
 fig = plt.figure()
 plt.plot(specialized, label='Specialized')

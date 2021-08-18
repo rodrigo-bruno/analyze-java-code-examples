@@ -1,6 +1,6 @@
 #!/bin/bash
 
-specializationjar=../build/libs/analyze-java-code-1.0-SNAPSHOT.jar
+specializationjar=../build/libs/specialized-java-datastructures-1.0-SNAPSHOT.jar
 JAVA_HOME=$HOME/software/labsjdk-ce-11.0.8-jvmci-20.2-b03/
 
 classpath="bin:gen/bin/unnamed:$specializationjar"

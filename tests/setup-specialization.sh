@@ -1,8 +1,8 @@
 #!/bin/bash
 
-specializationjar=../build/libs/analyze-java-code-1.0-SNAPSHOT.jar
-javaparser=/home/rbruno/.m2/repository/com/github/javaparser/javaparser-core/3.15.13/javaparser-core-3.15.13.jar
-jdksources=/home/rbruno/git/labs-openjdk-11/src/java.base/share/classes
+specializationjar=../build/libs/specialized-java-datastructures-1.0-SNAPSHOT.jar
+javaparser=$HOME/.m2/repository/com/github/javaparser/javaparser-core/3.15.13/javaparser-core-3.15.13.jar
+jdksources=$HOME/git/labs-openjdk-11/src/java.base/share/classes
 
 # Compile Point as we need it for specialization.
 javac -d bin src/my/testpackage/Point.java
